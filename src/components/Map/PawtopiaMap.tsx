@@ -25,7 +25,6 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
   const { animals, reports, zones, getWardReadiness, theme } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const heatLayerRef = useRef<L.LayerGroup | null>(null);
 
@@ -50,18 +49,12 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Initial tile layer based on current theme (CartoDB Dark Matter for dark, OpenStreetMap for light)
-    const tileUrl =
-      theme === 'dark'
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    const tileLayer = L.tileLayer(tileUrl, {
+    // OpenStreetMap tile layer (100% free and open, zero API key required in both light & dark mode)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors | Pawtopia Stray Surveillance',
       maxZoom: 19,
     }).addTo(map);
 
-    tileLayerRef.current = tileLayer;
     markersLayerRef.current = L.layerGroup().addTo(map);
     heatLayerRef.current = L.layerGroup().addTo(map);
 
@@ -70,19 +63,8 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
     return () => {
       map.remove();
       mapInstanceRef.current = null;
-      tileLayerRef.current = null;
     };
   }, []);
-
-  // Sync Leaflet tile layer whenever theme toggles between dark and light
-  useEffect(() => {
-    if (!tileLayerRef.current) return;
-    const newTileUrl =
-      theme === 'dark'
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    tileLayerRef.current.setUrl(newTileUrl);
-  }, [theme]);
 
   // Update Markers & Heatmap based on filters
   useEffect(() => {
