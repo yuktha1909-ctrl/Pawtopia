@@ -124,21 +124,21 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden my-8">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-rose-50 border-b border-rose-100">
+        <div className="flex items-center justify-between px-6 py-4 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-100 dark:border-rose-900/50">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-rose-600 text-white rounded-xl shadow-xs">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-rose-950 uppercase tracking-wide">
-                Emergency Animal Rescue Intake
+              <h2 className="text-sm font-black text-rose-950 dark:text-rose-100 uppercase tracking-wide">
+                {t('reportEmergency')}
               </h2>
-              <span className="text-[11px] font-semibold text-rose-700">Immediate routing to nearest NGO ambulance</span>
+              <span className="text-[11px] font-semibold text-rose-700 dark:text-rose-300">{t('emergencySubtitle')}</span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-stone-400 hover:text-stone-700 rounded-lg cursor-pointer"
+            className="p-1 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 rounded-lg cursor-pointer"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -148,18 +148,17 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
         {/* Content */}
         {submittedReportCode ? (
           <div className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl mx-auto flex items-center justify-center shadow-inner">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-2xl mx-auto flex items-center justify-center shadow-inner">
               <CheckCircle2 className="w-9 h-9" />
             </div>
-            <h3 className="text-xl font-black text-stone-900">Rescue Report Logged!</h3>
-            <p className="text-xs text-stone-600 max-w-sm mx-auto">
-              Your report has been broadcast to the on-duty rescue ambulance and municipal triage coordinator for{' '}
-              <strong>{wardName}</strong>.
+            <h3 className="text-xl font-black text-stone-900 dark:text-white">{t('reportSuccess')}</h3>
+            <p className="text-xs text-stone-600 dark:text-stone-300 max-w-sm mx-auto">
+              {wardName}
             </p>
 
-            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 inline-block">
-              <span className="text-[10px] uppercase font-bold text-stone-400 block">Tracking Reference Code</span>
-              <span className="text-xl font-black text-[#0B3E39] font-mono tracking-wider">{submittedReportCode}</span>
+            <div className="p-4 bg-stone-50 dark:bg-[#071917] rounded-2xl border border-stone-200 dark:border-teal-900/40 inline-block">
+              <span className="text-[10px] uppercase font-bold text-stone-400 block">{t('tagNumber')}</span>
+              <span className="text-xl font-black text-[#0B3E39] dark:text-teal-300 font-mono tracking-wider">{submittedReportCode}</span>
             </div>
 
             <div>
@@ -167,91 +166,91 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
                 onClick={handleReset}
                 className="w-full py-3 rounded-xl bg-[#0B3E39] text-[#FAF6EE] font-bold text-xs hover:bg-[#145E56] transition shadow-md cursor-pointer"
               >
-                Done &amp; Return to Map
+                {t('close')}
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs dark:bg-[#0A221F] text-stone-900 dark:text-stone-100">
             {/* Species & Severity */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Species</label>
+                <label className="block text-stone-700 dark:text-stone-200 font-bold mb-1">{t('species')}</label>
                 <select
                   value={species}
                   onChange={(e) => setSpecies(e.target.value as Species)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 font-semibold focus:outline-none"
+                  className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 font-semibold focus:outline-none"
                 >
-                  <option value="dog">🐕 Stray Dog</option>
-                  <option value="cat">🐈 Stray Cat</option>
+                  <option value="dog">🐕 {t('dog')}</option>
+                  <option value="cat">🐈 {t('cat')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Urgency / Severity</label>
+                <label className="block text-stone-700 dark:text-stone-200 font-bold mb-1">{t('severityLevel')}</label>
                 <select
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value as ReportSeverity)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 font-semibold focus:outline-none"
+                  className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 font-semibold focus:outline-none"
                 >
-                  <option value="critical">🚨 Critical / Life Threatening</option>
-                  <option value="high">⚠️ High Urgency</option>
-                  <option value="medium">🟡 Medium Urgency</option>
-                  <option value="low">🟢 Low / Non-Urgent</option>
+                  <option value="critical">🚨 {t('severityCritical')}</option>
+                  <option value="high">⚠️ {t('severityHigh')}</option>
+                  <option value="medium">🟡 {t('severityMedium')}</option>
+                  <option value="low">🟢 {t('severityLow')}</option>
                 </select>
               </div>
             </div>
 
             {/* Emergency Issue Type */}
             <div>
-              <label className="block text-stone-700 font-bold mb-1">Incident Classification</label>
+              <label className="block text-stone-700 dark:text-stone-200 font-bold mb-1">{t('emergencyType')}</label>
               <select
                 value={issueType}
                 onChange={(e) => setIssueType(e.target.value as any)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 font-semibold focus:outline-none"
+                className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 font-semibold focus:outline-none"
               >
-                <option value="injured">Severe Physical Injury / Open Wound</option>
-                <option value="hit_and_run">Vehicle Hit &amp; Run Collision</option>
-                <option value="suspected_rabies">⚠️ Suspected Rabies (Aggression, Salivation)</option>
-                <option value="sick_puppies">Abandoned / Sick Litter of Puppies/Kittens</option>
-                <option value="aggressive_pack">Aggressive Pack Confrontation</option>
-                <option value="cruelty">Animal Abuse / Cruelty Incident</option>
+                <option value="injured">{t('issueInjured')}</option>
+                <option value="hit_and_run">{t('issueHitAndRun')}</option>
+                <option value="suspected_rabies">{t('issueRabies')}</option>
+                <option value="sick_puppies">{t('issuePuppies')}</option>
+                <option value="aggressive_pack">{t('issueAggressive')}</option>
+                <option value="cruelty">{t('issueCruelty')}</option>
               </select>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-stone-700 font-bold mb-1">
-                Description of Animal &amp; Condition <span className="text-rose-600">*</span>
+              <label className="block text-stone-700 dark:text-stone-200 font-bold mb-1">
+                {t('incidentDescription')} <span className="text-rose-600">*</span>
               </label>
               <textarea
                 required
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="E.g. Brown dog limping with bleeding paw near metro pillar 42. Unable to bear weight."
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#0B3E39]/30"
+                placeholder={t('descriptionPlaceholder')}
+                className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-[#0B3E39]/30"
               />
             </div>
 
             {/* Location & GPS Auto-capture */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-stone-700 font-bold">Location &amp; Ward</label>
+                <label className="text-stone-700 dark:text-stone-200 font-bold">{t('incidentLocation')}</label>
                 <button
                   type="button"
                   onClick={handleCaptureGPS}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B3E39] hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-[#0B3E39] dark:text-teal-400 hover:underline cursor-pointer"
                 >
                   {locating ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
-                  <span>{locating ? 'Capturing GPS...' : 'Auto-Capture My GPS'}</span>
+                  <span>{locating ? 'GPS...' : t('liveGpsCoordinates')}</span>
                 </button>
               </div>
 
               <select
                 value={wardName}
                 onChange={(e) => setWardName(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2 font-semibold focus:outline-none"
+                className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2 font-semibold focus:outline-none"
               >
                 {zones.map((z) => (
                   <option key={z.id} value={z.wardName}>
@@ -264,38 +263,38 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Specific landmark or street address (e.g. Opposite State Bank, 100ft Rd)"
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2 focus:outline-none"
+                placeholder={t('incidentLocation')}
+                className="w-full bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2 focus:outline-none"
               />
             </div>
 
             {/* Photo Attachment */}
             <div>
-              <label className="block text-stone-700 font-bold mb-1">Photo Attachment</label>
+              <label className="block text-stone-700 dark:text-stone-200 font-bold mb-1">{t('uploadEvidence')}</label>
               <div className="flex items-center gap-3">
                 <img
                   src={photoUrl}
                   alt="Incident Preview"
-                  className="w-14 h-14 rounded-xl object-cover border border-stone-200"
+                  className="w-14 h-14 rounded-xl object-cover border border-stone-200 dark:border-teal-900/40"
                 />
-                <label className="flex-1 flex items-center justify-center gap-2 p-2.5 border border-dashed border-stone-300 rounded-xl bg-stone-50 hover:bg-stone-100 cursor-pointer text-stone-600 font-semibold">
-                  <Camera className="w-4 h-4 text-[#0B3E39]" />
-                  <span>Upload Incident Photo</span>
+                <label className="flex-1 flex items-center justify-center gap-2 p-2.5 border border-dashed border-stone-300 dark:border-teal-900/50 rounded-xl bg-stone-50 dark:bg-[#071917] hover:bg-stone-100 dark:hover:bg-[#0E2825] cursor-pointer text-stone-600 dark:text-stone-300 font-semibold">
+                  <Camera className="w-4 h-4 text-[#0B3E39] dark:text-teal-400" />
+                  <span>{t('uploadEvidence')}</span>
                   <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                 </label>
               </div>
             </div>
 
             {/* Anonymous Toggle & Reporter Info */}
-            <div className="pt-2 border-t border-stone-100 space-y-2">
-              <label className="flex items-center gap-2 text-stone-700 font-semibold cursor-pointer">
+            <div className="pt-2 border-t border-stone-100 dark:border-teal-900/40 space-y-2">
+              <label className="flex items-center gap-2 text-stone-700 dark:text-stone-300 font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isAnonymous}
                   onChange={(e) => setIsAnonymous(e.target.checked)}
                   className="rounded text-[#0B3E39] focus:ring-[#0B3E39]"
                 />
-                <span>Submit Anonymously (Hide my contact details from logs)</span>
+                <span>{t('anonymousReport')}</span>
               </label>
 
               {!isAnonymous && (
@@ -304,15 +303,15 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
                     type="text"
                     value={reporterName}
                     onChange={(e) => setReporterName(e.target.value)}
-                    placeholder="Your Name (Optional)"
-                    className="bg-stone-50 border border-stone-200 rounded-xl p-2"
+                    placeholder={t('reporterName')}
+                    className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2"
                   />
                   <input
                     type="tel"
                     value={reporterPhone}
                     onChange={(e) => setReporterPhone(e.target.value)}
-                    placeholder="Phone for updates"
-                    className="bg-stone-50 border border-stone-200 rounded-xl p-2"
+                    placeholder={t('reporterPhone')}
+                    className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2"
                   />
                 </div>
               )}
@@ -325,7 +324,7 @@ export const EmergencyReportModal: React.FC<EmergencyReportModalProps> = ({ isOp
               className="w-full py-3 rounded-xl bg-[#E63946] text-white font-bold text-xs uppercase tracking-wider hover:bg-rose-700 transition shadow-md shadow-rose-600/20 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
-              <span>{submitting ? 'Broadcasting Rescue Alert...' : 'Broadcast Emergency Rescue Request'}</span>
+              <span>{submitting ? '...' : t('submitReport')}</span>
             </button>
           </form>
         )}

@@ -22,7 +22,7 @@ interface PawtopiaMapProps {
 }
 
 export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSelectReport }) => {
-  const { animals, reports, zones, getWardReadiness, theme } = useApp();
+  const { animals, reports, zones, getWardReadiness, theme, t } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
@@ -226,10 +226,10 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-[#0B3E39] dark:text-teal-300" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-[#0B3E39] dark:text-teal-200">Stray Surveillance Map</h2>
+            <h2 className="text-xs font-black uppercase tracking-wider text-[#0B3E39] dark:text-teal-200">{t('publicMap')}</h2>
           </div>
           <span className="text-[11px] font-bold text-stone-600 dark:text-teal-200 bg-white dark:bg-[#071917] px-2 py-0.5 rounded-full border border-stone-200 dark:border-teal-500/20 shadow-2xs">
-            {animals.length} Animals Tracked
+            {animals.length} {t('allSpecies')}
           </span>
         </div>
 
@@ -243,7 +243,7 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
                 : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white'
             }`}
           >
-            All Species
+            {t('allSpecies')}
           </button>
           <button
             onClick={() => setSelectedSpecies('dog')}
@@ -254,7 +254,7 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
             }`}
           >
             <Dog className="w-3.5 h-3.5" />
-            <span>Dogs</span>
+            <span>{t('dog')}</span>
           </button>
           <button
             onClick={() => setSelectedSpecies('cat')}
@@ -265,18 +265,18 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
             }`}
           >
             <Cat className="w-3.5 h-3.5" />
-            <span>Cats</span>
+            <span>{t('cat')}</span>
           </button>
         </div>
 
         {/* Status Category Filter */}
         <div className="flex flex-wrap gap-1.5 mb-3">
           {[
-            { id: 'all', label: 'All Status' },
-            { id: 'valid', label: '🟢 Vaccinated' },
-            { id: 'due', label: '🟡 Due Soon' },
-            { id: 'unvaccinated', label: '⚪ Unvaccinated' },
-            { id: 'emergency', label: '🚨 Active Rescues' },
+            { id: 'all', label: t('all') },
+            { id: 'valid', label: `🟢 ${t('vaccinated')}` },
+            { id: 'due', label: `🟡 ${t('dueSoon')}` },
+            { id: 'unvaccinated', label: `⚪ ${t('unvaccinated')}` },
+            { id: 'emergency', label: `🚨 ${t('injured')}` },
           ].map((st) => (
             <button
               key={st.id}
@@ -296,7 +296,7 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
         <div className="flex items-center justify-between pt-2 border-t border-stone-200/80 dark:border-teal-500/20">
           <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 dark:text-stone-200 cursor-pointer">
             <Flame className={`w-4 h-4 ${showHeatmap ? 'text-rose-500 animate-pulse' : 'text-stone-400'}`} />
-            <span>Population &amp; Hotspot Heatmap</span>
+            <span>{t('mapTitle')}</span>
           </label>
           <input
             type="checkbox"
@@ -313,7 +313,7 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
             onChange={(e) => setSelectedWard(e.target.value)}
             className="w-full text-xs font-medium text-stone-700 dark:text-stone-200 bg-white dark:bg-[#0E2C28] border border-stone-200 dark:border-teal-500/20 rounded-xl px-2.5 py-1.5 focus:outline-none cursor-pointer"
           >
-            <option value="all">All City Wards &amp; Zones</option>
+            <option value="all">{t('allWards')}</option>
             {zones.map((z) => (
               <option key={z.id} value={z.wardName} className="dark:bg-[#0A221F]">
                 {z.wardName}

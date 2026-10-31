@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { Animal } from '../types';
+import { useApp } from '../context/AppContext';
 import { PawtopiaLogo } from './PawtopiaLogo';
 import {
   CollarTagPreset,
@@ -43,6 +44,7 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
   onClose,
   onSelectAnimal,
 }) => {
+  const { t } = useApp();
   const [selectedAnimalId, setSelectedAnimalId] = useState<string>(animal?.id || allAnimals[0]?.id || '');
   const [preset, setPreset] = useState<CollarTagPreset>('standard_hanging');
   const [isBatchMode, setIsBatchMode] = useState<boolean>(false);
@@ -137,14 +139,14 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-black text-[#0B3E39] dark:text-[#FAF6EE]">
-                  Collar Tag &amp; Field Label Generator
+                  {t('collarToolTitle')}
                 </h2>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-teal-100 dark:bg-teal-900/80 text-[#0B3E39] dark:text-teal-200 px-2 py-0.5 rounded-full border border-teal-300 dark:border-teal-700">
-                  Standard Format
+                  {t('collarTagFormat')}
                 </span>
               </div>
               <p className="text-xs text-stone-600 dark:text-stone-400">
-                Printable, tamper-resistant QR collar tags for newly registered strays with hole-punch &amp; strap-slot cut lines.
+                {t('collarToolSubtitle')}
               </p>
             </div>
           </div>
@@ -155,7 +157,7 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B3E39] text-[#FAF6EE] hover:bg-[#145E56] text-xs font-bold transition shadow-sm cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Print {isBatchMode ? `Batch (${batchAnimals.length})` : 'Collar Tag'}</span>
+              <span>{t('print')} {isBatchMode ? `(${batchAnimals.length})` : ''}</span>
             </button>
 
             <button
@@ -175,7 +177,7 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
             {/* Mode Switcher: Single vs Batch */}
             <div>
               <label className="block text-[11px] font-black text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2">
-                Printing Mode
+                {t('filter')}
               </label>
               <div className="grid grid-cols-2 gap-2 bg-stone-200 dark:bg-teal-950/80 p-1 rounded-2xl">
                 <button
@@ -188,7 +190,7 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
                   }`}
                 >
                   <Tag className="w-3.5 h-3.5" />
-                  <span>Single Animal</span>
+                  <span>{t('collarPreview')}</span>
                 </button>
                 <button
                   type="button"
@@ -203,7 +205,7 @@ export const CollarTagLabelGenerator: React.FC<CollarTagLabelGeneratorProps> = (
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
-                  <span>Batch Sheet (A4)</span>
+                  <span>{t('printBatch')}</span>
                 </button>
               </div>
             </div>

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const ReadinessScoreCard: React.FC = () => {
-  const { zones, getWardReadiness } = useApp();
+  const { zones, getWardReadiness, t } = useApp();
   const [selectedWardId, setSelectedWardId] = useState<string>(zones[0]?.id || '');
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
 
@@ -55,17 +55,16 @@ export const ReadinessScoreCard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FAF6EE] p-6 rounded-3xl border border-[#0B3E39]/15 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FAF6EE] dark:bg-[#0B2522] p-6 rounded-3xl border border-[#0B3E39]/15 dark:border-teal-900/50 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Award className="w-5 h-5 text-[#0B3E39]" />
-            <h1 className="text-xl font-black text-[#0B3E39] uppercase tracking-wide">
-              Ward Rabies-Free Readiness Index (0-100)
+            <Award className="w-5 h-5 text-[#0B3E39] dark:text-teal-300" />
+            <h1 className="text-xl font-black text-[#0B3E39] dark:text-teal-200 uppercase tracking-wide">
+              {t('readinessTitle')}
             </h1>
           </div>
-          <p className="text-xs text-stone-600 max-w-2xl">
-            Algorithmic readiness scoring combining vaccination herd immunity (70% target), humane sterilization rates,
-            bite incident penalties, rescue response speed, and census freshness.
+          <p className="text-xs text-stone-600 dark:text-stone-300 max-w-2xl">
+            {t('readinessSubtitle')}
           </p>
         </div>
 
@@ -74,7 +73,7 @@ export const ReadinessScoreCard: React.FC = () => {
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0B3E39] text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] transition shadow-xs cursor-pointer self-start md:self-auto"
         >
           <FileDown className="w-4 h-4" />
-          <span>Export Municipal PDF Report</span>
+          <span>{t('exportReport')}</span>
         </button>
       </div>
 

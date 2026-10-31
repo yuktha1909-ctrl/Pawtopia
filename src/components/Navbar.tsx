@@ -62,14 +62,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
   const navItems = [
     { id: 'map', label: t('publicMap'), icon: MapPin },
     { id: 'registry', label: t('registry'), icon: QrCode },
-    { id: 'reports', label: 'Emergency Queue', icon: AlertTriangle, badge: pendingEmergencies },
+    { id: 'reports', label: t('emergencyQueue'), icon: AlertTriangle, badge: pendingEmergencies },
     { id: 'tasks', label: t('ngoTasks'), icon: Kanban, roles: ['ngo', 'admin', 'vet'] },
     { id: 'readiness', label: t('readinessScore'), icon: BarChart3 },
     { id: 'inventory', label: t('inventoryBudget'), icon: Package, roles: ['ngo', 'vet', 'admin'] },
     { id: 'bites', label: t('biteControl'), icon: Radio },
     { id: 'camps', label: t('campsFeeders'), icon: Users },
     { id: 'transparency', label: t('transparency'), icon: Globe },
-    { id: 'login', label: authUser?.emailVerified ? 'Verified Account' : 'Login / Auth', icon: ShieldCheck },
+    { id: 'login', label: authUser?.emailVerified ? t('verifiedAccount') : t('loginAuth'), icon: ShieldCheck },
   ];
 
   const visibleNavItems = navItems.filter((item) => !item.roles || item.roles.includes(role));
@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
 
             {/* RBAC Role Selector Dropdown */}
             <div className="relative inline-flex items-center bg-white dark:bg-[#0E2825] border border-[#0B3E39]/20 dark:border-teal-900/60 rounded-xl p-1 shadow-xs">
-              <span className="text-[11px] font-semibold text-stone-500 dark:text-stone-400 px-2 uppercase tracking-wider">Role:</span>
+              <span className="text-[11px] font-semibold text-stone-500 dark:text-stone-400 px-2 uppercase tracking-wider">{t('roleLabel')}</span>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as Role)}
@@ -150,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
                   ? 'bg-teal-50 dark:bg-teal-900/50 border-teal-600 dark:border-teal-400'
                   : 'bg-white dark:bg-[#0E2825] border-stone-200 dark:border-teal-900/60 hover:bg-stone-50 dark:hover:bg-[#12332F]'
               }`}
-              title={authUser?.emailVerified ? `Verified Account: ${authUser.email}` : 'Sign In / Verify Account'}
+              title={authUser?.emailVerified ? `${t('verifiedEmailBadge')}: ${authUser.email}` : `${t('signInTab')} / ${t('actionRequiredVerify')}`}
             >
               {authUser ? (
                 <>
@@ -177,14 +177,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
                         authUser.emailVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                       }`}
                     >
-                      {authUser.emailVerified ? 'Verified' : 'Unverified'}
+                      {authUser.emailVerified ? t('verified') : t('unverified')}
                     </div>
                   </div>
                 </>
               ) : (
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#0B3E39] dark:text-teal-200">
                   <User className="w-4 h-4" />
-                  <span>Sign In</span>
+                  <span>{t('signInTab')}</span>
                 </div>
               )}
             </button>
@@ -294,7 +294,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
         <div className="lg:hidden bg-white dark:bg-[#071E1B] border-b border-stone-200 dark:border-teal-900/50 px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top-2">
           {/* Role selector for mobile */}
           <div className="p-3 bg-[#FAF6EE] dark:bg-[#0B2925] rounded-xl border border-stone-200 dark:border-teal-900/40">
-            <label className="block text-xs font-bold text-stone-600 dark:text-teal-200/80 mb-1.5">USER ROLE SWITCHER (RBAC)</label>
+            <label className="block text-xs font-bold text-stone-600 dark:text-teal-200/80 mb-1.5">{t('roleLabel')}</label>
             <div className="grid grid-cols-2 gap-2">
               {roles.map((r) => (
                 <button
@@ -364,7 +364,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
             <div className="flex items-center gap-2">
               {theme === 'dark' ? <Moon className="w-4 h-4 text-amber-300" /> : <Sun className="w-4 h-4 text-amber-600" />}
               <span className="text-xs font-bold text-stone-700 dark:text-stone-200">
-                Appearance: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                {t('appearance')}: {theme === 'dark' ? t('darkMode') : t('lightMode')}
               </span>
             </div>
             <button
@@ -376,12 +376,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
               {theme === 'dark' ? (
                 <>
                   <Sun className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Light Mode</span>
+                  <span>{t('lightMode')}</span>
                 </>
               ) : (
                 <>
                   <Moon className="w-3.5 h-3.5 text-stone-700" />
-                  <span>Dark Mode</span>
+                  <span>{t('darkMode')}</span>
                 </>
               )}
             </button>

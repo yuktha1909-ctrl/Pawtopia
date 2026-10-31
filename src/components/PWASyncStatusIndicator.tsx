@@ -23,6 +23,7 @@ export const PWASyncStatusIndicator: React.FC = () => {
     lastSyncTime,
     syncOfflineQueue,
     toggleSimulateOffline,
+    t,
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -86,10 +87,10 @@ export const PWASyncStatusIndicator: React.FC = () => {
         {/* Label */}
         <span>
           {!isOnline
-            ? 'Offline'
+            ? t('syncOffline')
             : isSyncing
-            ? 'Syncing...'
-            : 'Live'}
+            ? t('syncingNow')
+            : t('syncOnline')}
         </span>
 
         {/* Queue badge count */}
@@ -101,7 +102,7 @@ export const PWASyncStatusIndicator: React.FC = () => {
                 : 'bg-teal-700 text-white'
             }`}
           >
-            {offlineQueueCount} queued
+            {offlineQueueCount}
           </span>
         )}
 

@@ -41,6 +41,7 @@ import {
 import { calculateWardReadinessScore } from '../utils/readiness';
 import { generateFeatureVector } from '../utils/aiMatcher';
 import { createQueueItem } from '../utils/syncQueue';
+import { TRANSLATIONS } from '../data/translations';
 
 export type Language = 'en' | 'kn' | 'hi';
 
@@ -102,85 +103,25 @@ export interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Simple multilingual strings dictionary
-const TRANSLATIONS: Record<Language, Record<string, string>> = {
-  en: {
-    appTitle: 'Pawtopia',
-    tagline: 'A better world for every paw',
-    subtitle: 'Stray Dog & Cat Management and Rabies Control',
-    reportEmergency: 'Emergency Rescue Report',
-    publicMap: 'Stray & Health Map',
-    registry: 'Animal Health Identity',
-    readinessScore: 'Ward Rabies Readiness',
-    ngoTasks: 'Rescuer Taskboard',
-    inventoryBudget: 'Vaccine Stock & Grants',
-    biteControl: 'Bite & Rabies Center',
-    campsFeeders: 'Camps & Feeder Network',
-    transparency: 'Public City Transparency',
-    findAnimalAI: 'AI Photo Matcher',
-    roleCitizen: 'Citizen / Volunteer',
-    roleNGO: 'NGO Rescuer',
-    roleVet: 'Veterinarian',
-    roleAdmin: 'Municipal Authority',
-    vaccinated: 'Vaccinated',
-    sterilized: 'Sterilized',
-    unvaccinated: 'Unvaccinated',
-    injured: 'Emergency / Injured',
-    printCollarTag: 'Print QR Collar Tag',
-  },
-  kn: {
-    appTitle: 'ಪಾಟೋಪಿಯಾ (Pawtopia)',
-    tagline: 'ಪ್ರತಿಯೊಂದು ಪ್ರಾಣಿಗೂ ಸುಂದರ ಜಗತ್ತು',
-    subtitle: 'ಬೀದಿ ನಾಯಿ ಮತ್ತು ಬೆಕ್ಕುಗಳ ನಿರ್ವಹಣೆ ಹಾಗೂ ರೇಬೀಸ್ ನಿಯಂತ್ರಣ',
-    reportEmergency: 'ತುರ್ತು ರಕ್ಷಣಾ ವರದಿ',
-    publicMap: 'ಪ್ರಾಣಿಗಳ ಆರೋಗ್ಯ ನಕ್ಷೆ',
-    registry: 'ಪ್ರಾಣಿ ಆರೋಗ್ಯ ಗುರುತು',
-    readinessScore: 'ವಾರ್ಡ್ ರೇಬೀಸ್ ಸಿದ್ಧತಾ ಅಂಕ',
-    ngoTasks: 'ಕಾರ್ಯ ನಿರ್ವಹಣೆ ಫೀಡ್',
-    inventoryBudget: 'ಲಸಿಕೆ ದಾಸ್ತಾನು ಮತ್ತು ವೆಚ್ಚ',
-    biteControl: 'ಕಡಿತ ಪ್ರಕರಣ ಮತ್ತು ರೇಬೀಸ್ ಘಟಕ',
-    campsFeeders: 'ಲಸಿಕಾ ಶಿಬಿರ ಮತ್ತು ಪೋಷಕರು',
-    transparency: 'ಸಾರ್ವಜನಿಕ ನಗರ ಪ್ರಗತಿ',
-    findAnimalAI: 'AI ಫೋಟೋ ಹುಡುಕಾಟ',
-    roleCitizen: 'ನಾಗರಿಕ / ಸ್ವಯಂಸೇವಕ',
-    roleNGO: 'ಎನ್‌ಜಿಒ ರಕ್ಷಕ',
-    roleVet: 'ಪಶುವೈದ್ಯರು',
-    roleAdmin: 'ನಗರ ಪಾಲಿಕೆ ಪ್ರಾಧಿಕಾರ',
-    vaccinated: 'ಲಸಿಕೆ ಪಡೆದಿದೆ',
-    sterilized: 'ಸಂತಾನಹರಣ ಮಾಡಲಾಗಿದೆ',
-    unvaccinated: 'ಲಸಿಕೆ ಪಡೆದಿಲ್ಲ',
-    injured: 'ತುರ್ತು / ಗಾಯಗೊಂಡಿದೆ',
-    printCollarTag: 'QR ಕಾಲರ್ ಟ್ಯಾಗ್ ಪ್ರಿಂಟ್',
-  },
-  hi: {
-    appTitle: 'पॉपिया (Pawtopia)',
-    tagline: 'हर बेजुबान के लिए एक बेहतर संसार',
-    subtitle: 'आवारा श्वान एवं बिल्ली प्रबंधन तथा रेबीज नियंत्रण',
-    reportEmergency: 'आपातकालीन बचाव रिपोर्ट',
-    publicMap: 'आवारा पशु एवं स्वास्थ्य मानचित्र',
-    registry: 'पशु स्वास्थ्य पहचान (QR)',
-    readinessScore: 'वार्ड रेबीज-मुक्त स्कोर',
-    ngoTasks: 'कार्य बोर्ड (टास्क)',
-    inventoryBudget: 'वैक्सीन स्टॉक एवं बजट',
-    biteControl: 'श्वान दंश एवं रेबीज केंद्र',
-    campsFeeders: 'टीकाकरण शिविर व फीडर नेटवर्क',
-    transparency: 'सार्वजनिक नगर पारदर्शिता',
-    findAnimalAI: 'AI फोटो मिलान',
-    roleCitizen: 'नागरिक / स्वयंसेवक',
-    roleNGO: 'एनजीओ / बचाव दल',
-    roleVet: 'पशु चिकित्सक',
-    roleAdmin: 'नगर निगम / प्रशासन',
-    vaccinated: 'टीकाकृत (सुरक्षित)',
-    sterilized: 'नसबंदी संपन्न',
-    unvaccinated: 'टीकाकरण शेष',
-    injured: 'आपातकाल / घायल',
-    printCollarTag: 'QR कॉलर टैग प्रिंट करें',
-  },
-};
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<Role>('ngo');
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLangState] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem('pawtopia_lang');
+      if (saved === 'kn' || saved === 'hi' || saved === 'en') return saved;
+    } catch {}
+    return 'en';
+  });
+
+  const setLang = (newLang: Language) => {
+    setLangState(newLang);
+    try {
+      localStorage.setItem('pawtopia_lang', newLang);
+      document.documentElement.lang = newLang;
+    } catch {}
+  };
+
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
       const saved = localStorage.getItem('pawtopia_theme');

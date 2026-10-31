@@ -20,7 +20,7 @@ import { Animal } from './types';
 import { Heart, ShieldCheck, Phone, Mail, Award, Info } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
-  const { activeView, setActiveView, animals, selectedAnimalForQR, setSelectedAnimalForQR } = useApp();
+  const { activeView, setActiveView, animals, selectedAnimalForQR, setSelectedAnimalForQR, t } = useApp();
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isAIMatcherOpen, setIsAIMatcherOpen] = useState(false);
@@ -106,14 +106,13 @@ const MainAppContent: React.FC = () => {
             <div className="space-y-3">
               <PawtopiaLogo variant="full" size="sm" inverted />
               <p className="text-xs text-stone-300 leading-relaxed">
-                A unified, humane platform for municipal authorities, NGOs, veterinarians, and compassionate citizens to
-                monitor stray animals, eliminate rabies, and safeguard community health.
+                {t('footerDesc')}
               </p>
             </div>
 
             {/* Emergency Contacts */}
             <div className="space-y-2 text-xs">
-              <div className="font-bold uppercase tracking-wider text-teal-300">24/7 Animal Emergency Helpline</div>
+              <div className="font-bold uppercase tracking-wider text-teal-300">{t('helplineTitle')}</div>
               <div className="flex items-center gap-2 text-stone-200">
                 <Phone className="w-3.5 h-3.5 text-teal-400" />
                 <span className="font-mono font-bold text-sm">1800-PAW-HELP / +91 80 2200 4400</span>
@@ -123,54 +122,54 @@ const MainAppContent: React.FC = () => {
                 <span>rescue-control@pawtopia.org</span>
               </div>
               <p className="text-[11px] text-stone-400 pt-1">
-                Toll-free across Greater Bengaluru Municipal Zones (BBMP).
+                {t('helplineSub')}
               </p>
             </div>
 
             {/* Humane Standards */}
             <div className="space-y-2 text-xs">
-              <div className="font-bold uppercase tracking-wider text-teal-300">Humane Standards</div>
+              <div className="font-bold uppercase tracking-wider text-teal-300">{t('humaneStandardsTitle')}</div>
               <ul className="space-y-1 text-stone-300 text-[11px]">
-                <li>• WHO Rabies Herd Immunity Target (70%)</li>
-                <li>• Animal Birth Control (ABC) Rules 2023</li>
-                <li>• Return-to-Site Geofence Audits (&le; 500m)</li>
-                <li>• Cold-Chain Maintained Anti-Rabies Vaccines</li>
+                <li>• {t('standardWHO')}</li>
+                <li>• {t('standardABC')}</li>
+                <li>• {t('standardGeofence')}</li>
+                <li>• {t('standardColdChain')}</li>
               </ul>
             </div>
 
             {/* Quick Links */}
             <div className="space-y-2 text-xs">
-              <div className="font-bold uppercase tracking-wider text-teal-300">Platform Navigation</div>
+              <div className="font-bold uppercase tracking-wider text-teal-300">{t('appTitle')}</div>
               <div className="grid grid-cols-2 gap-1 text-[11px] text-stone-300">
                 <button onClick={() => setActiveView('map')} className="text-left hover:text-white cursor-pointer">
-                  Stray Map
+                  {t('publicMap')}
                 </button>
                 <button onClick={() => setActiveView('readiness')} className="text-left hover:text-white cursor-pointer">
-                  Readiness Score
+                  {t('readinessScore')}
                 </button>
                 <button onClick={() => setActiveView('registry')} className="text-left hover:text-white cursor-pointer">
-                  QR Registry
+                  {t('registry')}
                 </button>
                 <button onClick={() => setActiveView('transparency')} className="text-left hover:text-white cursor-pointer">
-                  Public Portal
+                  {t('transparency')}
                 </button>
                 <button onClick={() => setActiveView('bites')} className="text-left hover:text-white cursor-pointer">
-                  Bite &amp; PEP
+                  {t('biteControl')}
                 </button>
                 <button onClick={() => setIsAIMatcherOpen(true)} className="text-left hover:text-white cursor-pointer">
-                  AI Matcher
+                  {t('findAnimalAI')}
                 </button>
                 <button onClick={() => setActiveView('login')} className="text-left hover:text-white cursor-pointer text-teal-300 font-semibold">
-                  Verified Login
+                  {t('loginAuth')}
                 </button>
               </div>
             </div>
           </div>
 
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-teal-400/80 gap-2">
-            <div>&copy; {new Date().getFullYear()} Pawtopia Stray Dog &amp; Cat Management Platform. All rights reserved.</div>
+            <div>&copy; {new Date().getFullYear()} {t('copyrightNotice')}</div>
             <div className="flex items-center gap-1 text-stone-300">
-              Built with care for animals and city health <Heart className="w-3 h-3 text-rose-400 inline" />
+              {t('builtWithCare')} <Heart className="w-3 h-3 text-rose-400 inline" />
             </div>
           </div>
         </div>

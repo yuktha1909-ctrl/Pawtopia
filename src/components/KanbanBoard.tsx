@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const KanbanBoard: React.FC = () => {
-  const { tasks, updateTaskStatus, addTask, zones } = useApp();
+  const { tasks, updateTaskStatus, addTask, zones, t } = useApp();
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [showNewTaskModal, setShowNewTaskModal] = useState<boolean>(false);
 
@@ -26,10 +26,10 @@ export const KanbanBoard: React.FC = () => {
   const [newWard, setNewWard] = useState(zones[0]?.wardName || 'Ward 101 - Indiranagar');
 
   const columns: { id: Task['status']; title: string; color: string; border: string }[] = [
-    { id: 'todo', title: 'To Do / Intake', color: 'bg-stone-100 text-stone-800', border: 'border-stone-300' },
-    { id: 'in_progress', title: 'In Progress / Dispatched', color: 'bg-amber-100 text-amber-800', border: 'border-amber-300' },
-    { id: 'review', title: 'Medical / Release Review', color: 'bg-blue-100 text-blue-800', border: 'border-blue-300' },
-    { id: 'done', title: 'Completed & Released', color: 'bg-emerald-100 text-emerald-800', border: 'border-emerald-300' },
+    { id: 'todo', title: t('columnTodo'), color: 'bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-200', border: 'border-stone-300 dark:border-teal-900/50' },
+    { id: 'in_progress', title: t('columnInProgress'), color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-200', border: 'border-amber-300 dark:border-amber-800' },
+    { id: 'review', title: t('columnReview'), color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-200', border: 'border-blue-300 dark:border-blue-800' },
+    { id: 'done', title: t('columnDone'), color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-200', border: 'border-emerald-300 dark:border-emerald-800' },
   ];
 
   const filteredTasks = tasks.filter((t) => {
@@ -87,16 +87,16 @@ export const KanbanBoard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FAF6EE] p-6 rounded-3xl border border-[#0B3E39]/15">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FAF6EE] dark:bg-[#0E2825] p-6 rounded-3xl border border-[#0B3E39]/15 dark:border-teal-900/50">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Kanban className="w-5 h-5 text-[#0B3E39]" />
-            <h1 className="text-xl font-black text-[#0B3E39] uppercase tracking-wide">
-              NGO Field &amp; Rescue Taskboard
+            <Kanban className="w-5 h-5 text-[#0B3E39] dark:text-teal-400" />
+            <h1 className="text-xl font-black text-[#0B3E39] dark:text-teal-200 uppercase tracking-wide">
+              {t('tasksTitle')}
             </h1>
           </div>
-          <p className="text-xs text-stone-600">
-            Real-time rescue dispatches, vaccination sweeps, sterilization surgeries, and release verifications.
+          <p className="text-xs text-stone-600 dark:text-stone-300">
+            {t('tasksSubtitle')}
           </p>
         </div>
 
@@ -104,9 +104,9 @@ export const KanbanBoard: React.FC = () => {
           <select
             value={selectedWard}
             onChange={(e) => setSelectedWard(e.target.value)}
-            className="text-xs font-semibold text-stone-700 bg-white border border-stone-200 rounded-xl px-3 py-2 cursor-pointer focus:outline-none"
+            className="text-xs font-semibold text-stone-700 dark:text-stone-200 bg-white dark:bg-[#071E1B] border border-stone-200 dark:border-teal-900/60 rounded-xl px-3 py-2 cursor-pointer focus:outline-none"
           >
-            <option value="all">All City Wards</option>
+            <option value="all">{t('allWards')}</option>
             {zones.map((z) => (
               <option key={z.id} value={z.wardName}>
                 {z.wardName}
@@ -116,10 +116,10 @@ export const KanbanBoard: React.FC = () => {
 
           <button
             onClick={() => setShowNewTaskModal(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B3E39] text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] transition shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B3E39] dark:bg-teal-700 text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] transition shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>New Task</span>
+            <span>{t('addNewTask')}</span>
           </button>
         </div>
       </div>
@@ -130,10 +130,10 @@ export const KanbanBoard: React.FC = () => {
           const colTasks = filteredTasks.filter((t) => t.status === col.id);
 
           return (
-            <div key={col.id} className="bg-white rounded-3xl p-4 border border-stone-200 shadow-xs flex flex-col">
+            <div key={col.id} className="bg-white dark:bg-[#0E2825] rounded-3xl p-4 border border-stone-200 dark:border-teal-900/60 shadow-xs flex flex-col">
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-3">
-                <span className="text-xs font-black text-stone-800 uppercase tracking-wider">{col.title}</span>
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-teal-900/40 mb-3">
+                <span className="text-xs font-black text-stone-800 dark:text-teal-200 uppercase tracking-wider">{col.title}</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${col.color}`}>
                   {colTasks.length}
                 </span>
@@ -142,8 +142,8 @@ export const KanbanBoard: React.FC = () => {
               {/* Tasks List */}
               <div className="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1">
                 {colTasks.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                    No active tasks in this stage
+                  <div className="p-6 text-center text-xs text-stone-400 dark:text-stone-500 bg-stone-50 dark:bg-[#071B19] rounded-2xl border border-dashed border-stone-200 dark:border-teal-900/40">
+                    {t('noAnimalsFound')}
                   </div>
                 ) : (
                   colTasks.map((task) => {
@@ -153,7 +153,7 @@ export const KanbanBoard: React.FC = () => {
                     return (
                       <div
                         key={task.id}
-                        className="p-3.5 bg-stone-50 hover:bg-stone-100/80 rounded-2xl border border-stone-200 transition space-y-2.5"
+                        className="p-3.5 bg-stone-50 dark:bg-[#0B2522] hover:bg-stone-100/80 dark:hover:bg-[#0E2F2B] rounded-2xl border border-stone-200 dark:border-teal-900/40 transition space-y-2.5"
                       >
                         <div className="flex items-center justify-between">
                           <span
@@ -161,33 +161,33 @@ export const KanbanBoard: React.FC = () => {
                               task.priority
                             )}`}
                           >
-                            {task.priority}
+                            {task.priority === 'urgent' ? t('severityCritical') : task.priority === 'high' ? t('severityHigh') : task.priority === 'medium' ? t('severityMedium') : t('severityLow')}
                           </span>
-                          <span className="text-[10px] font-bold text-stone-500 uppercase tracking-tight">
-                            {task.type}
+                          <span className="text-[10px] font-bold text-stone-500 dark:text-teal-400/80 uppercase tracking-tight">
+                            {task.type === 'rescue' ? t('typeRescue') : task.type === 'vaccination' ? t('typeVaccination') : task.type === 'sterilization' ? t('typeSterilization') : task.type === 'release' ? t('typeRelease') : t('typeFollowup')}
                           </span>
                         </div>
 
-                        <h4 className="text-xs font-black text-stone-900 leading-snug">{task.title}</h4>
+                        <h4 className="text-xs font-black text-stone-900 dark:text-stone-100 leading-snug">{task.title}</h4>
 
-                        <div className="text-[11px] text-stone-500 space-y-1">
+                        <div className="text-[11px] text-stone-500 dark:text-stone-400 space-y-1">
                           <div className="flex items-center gap-1.5 truncate">
-                            <User className="w-3 h-3 text-stone-400" />
+                            <User className="w-3 h-3 text-stone-400 dark:text-stone-500" />
                             <span>{task.assignedTo}</span>
                           </div>
                           <div className="flex items-center gap-1.5 truncate">
-                            <Clock className="w-3 h-3 text-stone-400" />
-                            <span>Due: {task.dueDate} • {task.wardName.split('-')[1] || task.wardName}</span>
+                            <Clock className="w-3 h-3 text-stone-400 dark:text-stone-500" />
+                            <span>{t('dueDate')}: {task.dueDate} • {task.wardName.split('-')[1] || task.wardName}</span>
                           </div>
                         </div>
 
                         {/* Movement Action Buttons */}
-                        <div className="pt-2 border-t border-stone-200/80 flex items-center justify-between">
+                        <div className="pt-2 border-t border-stone-200/80 dark:border-teal-900/40 flex items-center justify-between">
                           {prevSt ? (
                             <button
                               onClick={() => updateTaskStatus(task.id, prevSt)}
-                              className="p-1 rounded-lg hover:bg-stone-200 text-stone-500 hover:text-stone-800 transition cursor-pointer"
-                              title="Move back"
+                              className="p-1 rounded-lg hover:bg-stone-200 dark:hover:bg-[#143B36] text-stone-500 dark:text-stone-400 hover:text-stone-800 transition cursor-pointer"
+                              title={t('back')}
                             >
                               <ArrowLeft className="w-3.5 h-3.5" />
                             </button>
@@ -198,9 +198,9 @@ export const KanbanBoard: React.FC = () => {
                           {nextSt && (
                             <button
                               onClick={() => updateTaskStatus(task.id, nextSt)}
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0B3E39] text-[#FAF6EE] text-[10px] font-bold hover:bg-[#145E56] transition cursor-pointer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#0B3E39] dark:bg-teal-700 text-[#FAF6EE] text-[10px] font-bold hover:bg-[#145E56] transition cursor-pointer"
                             >
-                              <span>Next Stage</span>
+                              <span>{t('confirm')}</span>
                               <ArrowRight className="w-3 h-3" />
                             </button>
                           )}
@@ -218,71 +218,71 @@ export const KanbanBoard: React.FC = () => {
       {/* New Task Modal */}
       {showNewTaskModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-stone-200 p-6">
-            <h3 className="text-sm font-black text-stone-900 uppercase tracking-wide mb-4">
-              Dispatch New Field Task
+          <div className="relative w-full max-w-md bg-white dark:bg-[#0B2522] rounded-3xl shadow-2xl border border-stone-200 dark:border-teal-900/60 p-6">
+            <h3 className="text-sm font-black text-stone-900 dark:text-stone-100 uppercase tracking-wide mb-4">
+              {t('addNewTask')}
             </h3>
 
             <form onSubmit={handleCreateTask} className="space-y-3 text-xs">
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Task Title</label>
+                <label className="block text-stone-700 dark:text-stone-300 font-bold mb-1">{t('taskTitle')}</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="E.g. Vaccinate 5 stray dogs at Indiranagar 12th Main"
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5 focus:outline-none"
+                  className="w-full bg-stone-50 dark:bg-[#071B19] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 text-stone-900 dark:text-stone-100 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Operation Type</label>
+                  <label className="block text-stone-700 dark:text-stone-300 font-bold mb-1">{t('taskType')}</label>
                   <select
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as any)}
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2 font-semibold"
+                    className="w-full bg-stone-50 dark:bg-[#071B19] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2 font-semibold text-stone-800 dark:text-stone-200"
                   >
-                    <option value="rescue">Rescue</option>
-                    <option value="vaccination">Vaccination</option>
-                    <option value="sterilization">Sterilization</option>
-                    <option value="release">Return-to-Site</option>
-                    <option value="followup">Follow-up</option>
+                    <option value="rescue">{t('typeRescue')}</option>
+                    <option value="vaccination">{t('typeVaccination')}</option>
+                    <option value="sterilization">{t('typeSterilization')}</option>
+                    <option value="release">{t('typeRelease')}</option>
+                    <option value="followup">{t('typeFollowup')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Priority</label>
+                  <label className="block text-stone-700 dark:text-stone-300 font-bold mb-1">{t('priority')}</label>
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as any)}
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2 font-semibold"
+                    className="w-full bg-stone-50 dark:bg-[#071B19] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2 font-semibold text-stone-800 dark:text-stone-200"
                   >
-                    <option value="urgent">Urgent</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                    <option value="urgent">{t('severityCritical')}</option>
+                    <option value="high">{t('severityHigh')}</option>
+                    <option value="medium">{t('severityMedium')}</option>
+                    <option value="low">{t('severityLow')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Assignee</label>
+                <label className="block text-stone-700 dark:text-stone-300 font-bold mb-1">{t('assignedTo')}</label>
                 <input
                   type="text"
                   value={newAssignee}
                   onChange={(e) => setNewAssignee(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2.5"
+                  className="w-full bg-stone-50 dark:bg-[#071B19] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2.5 text-stone-900 dark:text-stone-100"
                 />
               </div>
 
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Ward Location</label>
+                <label className="block text-stone-700 dark:text-stone-300 font-bold mb-1">{t('primaryTerritory')}</label>
                 <select
                   value={newWard}
                   onChange={(e) => setNewWard(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-2 font-semibold"
+                  className="w-full bg-stone-50 dark:bg-[#071B19] border border-stone-200 dark:border-teal-900/50 rounded-xl p-2 font-semibold text-stone-800 dark:text-stone-200"
                 >
                   {zones.map((z) => (
                     <option key={z.id} value={z.wardName}>
@@ -295,16 +295,16 @@ export const KanbanBoard: React.FC = () => {
               <div className="flex gap-2 pt-3">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#0B3E39] text-[#FAF6EE] font-bold rounded-xl hover:bg-[#145E56] cursor-pointer"
+                  className="flex-1 py-2.5 bg-[#0B3E39] dark:bg-teal-700 text-[#FAF6EE] font-bold rounded-xl hover:bg-[#145E56] cursor-pointer"
                 >
-                  Create &amp; Dispatch
+                  {t('submit')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowNewTaskModal(false)}
-                  className="px-4 py-2.5 border border-stone-200 text-stone-600 font-bold rounded-xl cursor-pointer"
+                  className="px-4 py-2.5 border border-stone-200 dark:border-teal-900/50 text-stone-600 dark:text-stone-300 font-bold rounded-xl cursor-pointer"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
               </div>
             </form>

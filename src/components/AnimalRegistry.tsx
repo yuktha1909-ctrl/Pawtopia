@@ -25,7 +25,7 @@ interface AnimalRegistryProps {
 }
 
 export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, onOpenAIMatcher }) => {
-  const { animals, registerAnimal, zones, role } = useApp();
+  const { animals, registerAnimal, zones, role, t } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [speciesFilter, setSpeciesFilter] = useState<'all' | 'dog' | 'cat'>('all');
@@ -120,11 +120,11 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
           <div className="flex items-center gap-2 mb-1">
             <Tag className="w-5 h-5 text-[#0B3E39] dark:text-teal-400" />
             <h1 className="text-xl font-black text-[#0B3E39] dark:text-white uppercase tracking-wide">
-              Animal Health Identity &amp; QR Registry
+              {t('registryTitle')}
             </h1>
           </div>
           <p className="text-xs text-stone-600 dark:text-stone-300">
-            Official municipal database of vaccinated, sterilized, and community-protected dogs and cats.
+            {t('registrySubtitle')}
           </p>
         </div>
 
@@ -136,10 +136,10 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
               setShowCollarTagTool(true);
             }}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-600/40 text-amber-900 dark:text-amber-200 text-xs font-bold hover:bg-amber-100 dark:hover:bg-amber-900/60 transition shadow-2xs cursor-pointer"
-            title="Generate printable standard collar tag labels (single or batch sheet)"
+            title="Generate printable standard collar tag labels"
           >
             <Printer className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span>Collar Tag Generator</span>
+            <span>{t('printCollarTag')}</span>
           </button>
 
           <button
@@ -147,7 +147,7 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-500/30 text-[#0B3E39] dark:text-teal-200 text-xs font-bold hover:bg-teal-100 dark:hover:bg-teal-900/50 transition shadow-2xs cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-            <span>AI Photo Search</span>
+            <span>{t('findAnimalAI')}</span>
           </button>
 
           <button
@@ -155,7 +155,7 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B3E39] dark:bg-gradient-to-r dark:from-teal-600 dark:to-emerald-600 text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] dark:hover:from-teal-500 dark:hover:to-emerald-500 transition shadow-xs dark:shadow-[0_0_15px_rgba(20,184,166,0.3)] cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Register New Animal</span>
+            <span>{t('registerNewAnimal')}</span>
           </button>
         </div>
       </div>
@@ -169,7 +169,7 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by tag # (PAW-IND-001), name, ward, color..."
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2 text-xs bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-500/25 rounded-xl text-stone-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#0B3E39]/20 dark:focus:ring-teal-500/30"
           />
         </div>
@@ -181,9 +181,9 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             onChange={(e) => setSpeciesFilter(e.target.value as any)}
             className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-500/25 rounded-xl px-3 py-2 font-semibold text-stone-700 dark:text-stone-200 cursor-pointer focus:outline-none"
           >
-            <option value="all">All Species</option>
-            <option value="dog">🐕 Dogs</option>
-            <option value="cat">🐈 Cats</option>
+            <option value="all">{t('allSpecies')}</option>
+            <option value="dog">🐕 {t('dog')}</option>
+            <option value="cat">🐈 {t('cat')}</option>
           </select>
 
           <select
@@ -191,11 +191,11 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             onChange={(e) => setVaxFilter(e.target.value)}
             className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-500/25 rounded-xl px-3 py-2 font-semibold text-stone-700 dark:text-stone-200 cursor-pointer focus:outline-none"
           >
-            <option value="all">All Vaccination</option>
-            <option value="valid">Protected (Valid)</option>
-            <option value="due_soon">Due Soon (&lt; 30d)</option>
-            <option value="overdue">Overdue</option>
-            <option value="unvaccinated">Unvaccinated</option>
+            <option value="all">{t('all')} {t('vaccinated')}</option>
+            <option value="valid">{t('valid')}</option>
+            <option value="due_soon">{t('dueSoon')}</option>
+            <option value="overdue">{t('overdue')}</option>
+            <option value="unvaccinated">{t('unvaccinated')}</option>
           </select>
 
           <select
@@ -203,9 +203,9 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             onChange={(e) => setSterilFilter(e.target.value)}
             className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-500/25 rounded-xl px-3 py-2 font-semibold text-stone-700 dark:text-stone-200 cursor-pointer focus:outline-none"
           >
-            <option value="all">All Sterilization</option>
-            <option value="sterilized">Sterilized</option>
-            <option value="intact">Intact</option>
+            <option value="all">{t('all')} {t('sterilized')}</option>
+            <option value="sterilized">{t('sterilized')}</option>
+            <option value="intact">{t('intact')}</option>
           </select>
 
           <select
@@ -213,7 +213,7 @@ export const AnimalRegistry: React.FC<AnimalRegistryProps> = ({ onSelectAnimal, 
             onChange={(e) => setWardFilter(e.target.value)}
             className="bg-stone-50 dark:bg-[#071917] border border-stone-200 dark:border-teal-500/25 rounded-xl px-3 py-2 font-semibold text-stone-700 dark:text-stone-200 cursor-pointer focus:outline-none"
           >
-            <option value="all">All Wards</option>
+            <option value="all">{t('allWards')}</option>
             {zones.map((z) => (
               <option key={z.id} value={z.wardName}>
                 {z.wardName}
