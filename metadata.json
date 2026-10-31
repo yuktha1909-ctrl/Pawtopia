@@ -1,0 +1,8 @@
+{
+  "name": "Pawtopia - Stray Animal Management & Rabies Control",
+  "description": "Comprehensive municipal and NGO platform for stray dog and cat management, rabies vaccination tracking, emergency rescue routing, and ward readiness scores.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
