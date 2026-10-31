@@ -244,3 +244,13 @@ export interface ReadinessScoreResult {
   recommendations: string[];
 }
 
+export interface AuthUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoUrl: string | null;
+  emailVerified: boolean;
+  role: Role;
+  provider: 'google' | 'password' | 'demo';
+}
+

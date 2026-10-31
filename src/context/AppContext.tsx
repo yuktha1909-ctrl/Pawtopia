@@ -15,7 +15,18 @@ import {
   VaccinationStatus,
   ReadinessScoreResult,
   OfflineQueueItem,
+  AuthUser,
 } from '../types';
+import {
+  auth,
+  googleProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+  onAuthStateChanged,
+} from '../firebase';
 import {
   INITIAL_ANIMALS,
   INITIAL_REPORTS,
@@ -40,6 +51,19 @@ export interface AppContextType {
   toggleTheme: () => void;
   lang: Language;
   setLang: (lang: Language) => void;
+  // Auth state and actions
+  authUser: AuthUser | null;
+  authLoading: boolean;
+  authError: string | null;
+  authSuccessMsg: string | null;
+  clearAuthError: () => void;
+  loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, pass: string) => Promise<void>;
+  registerWithEmail: (email: string, pass: string, displayName: string, chosenRole: Role) => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
+  reloadUserVerification: () => Promise<boolean>;
+  logout: () => Promise<void>;
+  loginAsVerifiedDemo: (role: Role) => void;
   animals: Animal[];
   setAnimals: React.Dispatch<React.SetStateAction<Animal[]>>;
   reports: EmergencyReport[];
@@ -224,6 +248,288 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const offlineQueueCount = offlineQueue.length;
+
+  // Authentication State
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => {
+    try {
+      const saved = localStorage.getItem('pawtopia_auth_user');
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore
+    }
+    return {
+      uid: 'paw-verified-lead-01',
+      displayName: 'Dr. Ananya Sharma',
+      email: 'ananya.sharma@bbmp-animalcare.gov.in',
+      photoUrl: 'https://images.unsplash.com/photo-1594824813624-9fa2a5884ffb?auto=format&fit=crop&w=256&q=80',
+      emailVerified: true,
+      role: 'ngo',
+      provider: 'demo',
+    };
+  });
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccessMsg, setAuthSuccessMsg] = useState<string | null>(null);
+
+  const clearAuthError = () => {
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+  };
+
+  // Sync role with authUser
+  useEffect(() => {
+    if (authUser && authUser.role !== role) {
+      setAuthUser((prev) => (prev ? { ...prev, role } : null));
+    }
+  }, [role]);
+
+  // Listen to Firebase Auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        const isGoogle = fbUser.providerData.some((p) => p.providerId === 'google.com');
+        const updated: AuthUser = {
+          uid: fbUser.uid,
+          email: fbUser.email,
+          displayName: fbUser.displayName || (fbUser.email ? fbUser.email.split('@')[0] : 'Pawtopia Member'),
+          photoUrl: fbUser.photoURL,
+          // Google accounts are inherently verified in Firebase
+          emailVerified: isGoogle || fbUser.emailVerified,
+          role: role,
+          provider: isGoogle ? 'google' : 'password',
+        };
+        setAuthUser(updated);
+        try {
+          localStorage.setItem('pawtopia_auth_user', JSON.stringify(updated));
+        } catch {
+          // ignore
+        }
+      }
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [role]);
+
+  // Google Login (Auto-verified email)
+  const loginWithGoogle = async () => {
+    setAuthLoading(true);
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const fbUser = result.user;
+      const verifiedUser: AuthUser = {
+        uid: fbUser.uid,
+        email: fbUser.email,
+        displayName: fbUser.displayName || 'Google Verified User',
+        photoUrl: fbUser.photoURL,
+        emailVerified: true, // Google accounts come pre-verified
+        role: role,
+        provider: 'google',
+      };
+      setAuthUser(verifiedUser);
+      try {
+        localStorage.setItem('pawtopia_auth_user', JSON.stringify(verifiedUser));
+      } catch {
+        // ignore
+      }
+      setAuthSuccessMsg(`Signed in with verified Google account: ${verifiedUser.email}`);
+    } catch (err: any) {
+      console.error('Google sign in error:', err);
+      // Fallback friendly message for popup blockers or domain restrictions
+      if (err?.code === 'auth/popup-blocked') {
+        setAuthError('Sign-in popup was blocked by browser. Please allow popups for Pawtopia or use email sign-in.');
+      } else if (err?.code === 'auth/unauthorized-domain') {
+        // Handled gracefully with fallback
+        setAuthError('Firebase domain not yet whitelisted in Google Cloud Console. You can use verified demo roles or email sign-in.');
+      } else {
+        setAuthError(err?.message || 'Google sign-in could not be completed.');
+      }
+      throw err;
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Email / Password Login
+  const loginWithEmail = async (email: string, pass: string) => {
+    setAuthLoading(true);
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = cred.user;
+      const loggedUser: AuthUser = {
+        uid: fbUser.uid,
+        email: fbUser.email,
+        displayName: fbUser.displayName || email.split('@')[0],
+        photoUrl: fbUser.photoURL,
+        emailVerified: fbUser.emailVerified,
+        role: role,
+        provider: 'password',
+      };
+      setAuthUser(loggedUser);
+      try {
+        localStorage.setItem('pawtopia_auth_user', JSON.stringify(loggedUser));
+      } catch {
+        // ignore
+      }
+      setAuthSuccessMsg(`Logged in successfully as ${loggedUser.email}`);
+    } catch (err: any) {
+      console.error('Email login error:', err);
+      if (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential') {
+        setAuthError('No account found with these credentials. Please check your email or click "Create Account".');
+      } else if (err?.code === 'auth/wrong-password') {
+        setAuthError('Incorrect password. Please try again.');
+      } else {
+        setAuthError(err?.message || 'Failed to sign in.');
+      }
+      throw err;
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Register with Email and send verification email
+  const registerWithEmail = async (email: string, pass: string, displayName: string, chosenRole: Role) => {
+    setAuthLoading(true);
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = cred.user;
+      // Send real Firebase verification email
+      try {
+        await sendEmailVerification(fbUser);
+      } catch (verifyErr) {
+        console.warn('Could not dispatch sendEmailVerification immediately', verifyErr);
+      }
+      const newUser: AuthUser = {
+        uid: fbUser.uid,
+        email: fbUser.email,
+        displayName: displayName.trim() || email.split('@')[0],
+        photoUrl: null,
+        emailVerified: fbUser.emailVerified,
+        role: chosenRole,
+        provider: 'password',
+      };
+      setRole(chosenRole);
+      setAuthUser(newUser);
+      try {
+        localStorage.setItem('pawtopia_auth_user', JSON.stringify(newUser));
+      } catch {
+        // ignore
+      }
+      setAuthSuccessMsg(`Account created for ${newUser.email}! A verification link has been sent to your inbox.`);
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      if (err?.code === 'auth/email-already-in-use') {
+        setAuthError('An account with this email already exists. Please switch to "Sign In".');
+      } else if (err?.code === 'auth/weak-password') {
+        setAuthError('Password should be at least 6 characters.');
+      } else {
+        setAuthError(err?.message || 'Could not create account.');
+      }
+      throw err;
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // Send or resend verification email
+  const sendVerificationEmail = async () => {
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+    if (auth.currentUser) {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        setAuthSuccessMsg(`Verification email successfully sent to ${auth.currentUser.email}. Please check your inbox.`);
+      } catch (err: any) {
+        console.error('Send verification error', err);
+        setAuthError(err?.message || 'Could not send verification email.');
+      }
+    } else {
+      setAuthError('No active user logged in to verify.');
+    }
+  };
+
+  // Reload user status from Firebase to check if user verified email
+  const reloadUserVerification = async (): Promise<boolean> => {
+    setAuthError(null);
+    setAuthSuccessMsg(null);
+    if (auth.currentUser) {
+      try {
+        await auth.currentUser.reload();
+        const isVerified = auth.currentUser.emailVerified;
+        setAuthUser((prev) => {
+          if (!prev) return null;
+          const updated = { ...prev, emailVerified: isVerified };
+          try {
+            localStorage.setItem('pawtopia_auth_user', JSON.stringify(updated));
+          } catch {
+            // ignore
+          }
+          return updated;
+        });
+        if (isVerified) {
+          setAuthSuccessMsg('Email verified successfully! You have full verified credentials.');
+        } else {
+          setAuthError('Your email address has not been verified yet. Please click the link sent to your inbox.');
+        }
+        return isVerified;
+      } catch (err: any) {
+        console.error('Reload verification error', err);
+        setAuthError(err?.message || 'Could not refresh verification status.');
+      }
+    }
+    return false;
+  };
+
+  // Logout
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.warn('Signout warning', e);
+    }
+    setAuthUser(null);
+    try {
+      localStorage.removeItem('pawtopia_auth_user');
+    } catch {
+      // ignore
+    }
+    setAuthSuccessMsg('You have been logged out.');
+  };
+
+  // Instant switch to verified role (for municipal officers, vets, rescuers, citizens)
+  const loginAsVerifiedDemo = (targetRole: Role) => {
+    clearAuthError();
+    const roleProfiles: Record<Role, { name: string; email: string }> = {
+      admin: { name: 'Dr. Ramesh Rao (BBMP Joint Commissioner)', email: 'ramesh.rao@bbmp.gov.in' },
+      ngo: { name: 'Dr. Ananya Sharma (Lead Field Rescuer)', email: 'ananya.sharma@bbmp-animalcare.gov.in' },
+      vet: { name: 'Dr. Vivek Menon, MVSc (Chief Veterinary Surgeon)', email: 'dr.menon@pawtopia-health.org' },
+      citizen: { name: 'Kavitha Sundaram (Active Community Feeder)', email: 'kavitha.sundaram@gmail.com' },
+    };
+    const profile = roleProfiles[targetRole];
+    const verifiedUser: AuthUser = {
+      uid: `verified-staff-${targetRole}`,
+      displayName: profile.name,
+      email: profile.email,
+      photoUrl: null,
+      emailVerified: true,
+      role: targetRole,
+      provider: 'demo',
+    };
+    setRole(targetRole);
+    setAuthUser(verifiedUser);
+    try {
+      localStorage.setItem('pawtopia_auth_user', JSON.stringify(verifiedUser));
+    } catch {
+      // ignore
+    }
+    setAuthSuccessMsg(`Switched to verified ${targetRole.toUpperCase()} account: ${profile.email}`);
+  };
 
   // Persist queue to localStorage
   useEffect(() => {
@@ -593,6 +899,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTheme,
         lang,
         setLang,
+        authUser,
+        authLoading,
+        authError,
+        authSuccessMsg,
+        clearAuthError,
+        loginWithGoogle,
+        loginWithEmail,
+        registerWithEmail,
+        sendVerificationEmail,
+        reloadUserVerification,
+        logout,
+        loginAsVerifiedDemo,
         animals,
         setAnimals,
         reports,

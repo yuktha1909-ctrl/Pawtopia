@@ -25,6 +25,7 @@ import {
   Sparkles,
   Sun,
   Moon,
+  User,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -33,7 +34,20 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatcherModal }) => {
-  const { role, setRole, theme, toggleTheme, lang, setLang, activeView, setActiveView, isOnline, t, reports } = useApp();
+  const {
+    role,
+    setRole,
+    theme,
+    toggleTheme,
+    lang,
+    setLang,
+    activeView,
+    setActiveView,
+    isOnline,
+    t,
+    reports,
+    authUser,
+  } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const pendingEmergencies = reports.filter((r) => r.status === 'reported' || r.status === 'in_progress').length;
@@ -55,6 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
     { id: 'bites', label: t('biteControl'), icon: Radio },
     { id: 'camps', label: t('campsFeeders'), icon: Users },
     { id: 'transparency', label: t('transparency'), icon: Globe },
+    { id: 'login', label: authUser?.emailVerified ? 'Verified Account' : 'Login / Auth', icon: ShieldCheck },
   ];
 
   const visibleNavItems = navItems.filter((item) => !item.roles || item.roles.includes(role));
@@ -127,6 +142,53 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
               </select>
             </div>
 
+            {/* User Account / Profile & Verification Button */}
+            <button
+              onClick={() => setActiveView('login')}
+              className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition shadow-2xs cursor-pointer ${
+                activeView === 'login'
+                  ? 'bg-teal-50 dark:bg-teal-900/50 border-teal-600 dark:border-teal-400'
+                  : 'bg-white dark:bg-[#0E2825] border-stone-200 dark:border-teal-900/60 hover:bg-stone-50 dark:hover:bg-[#12332F]'
+              }`}
+              title={authUser?.emailVerified ? `Verified Account: ${authUser.email}` : 'Sign In / Verify Account'}
+            >
+              {authUser ? (
+                <>
+                  <div className="relative">
+                    {authUser.photoUrl ? (
+                      <img src={authUser.photoUrl} alt="" className="w-6 h-6 rounded-lg object-cover" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-lg bg-[#0B3E39] dark:bg-teal-700 text-white flex items-center justify-center text-[11px] font-bold">
+                        {authUser.displayName ? authUser.displayName.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
+                    <span
+                      className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white dark:border-[#0E2825] ${
+                        authUser.emailVerified ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'
+                      }`}
+                    />
+                  </div>
+                  <div className="text-left hidden xl:block">
+                    <div className="text-xs font-bold leading-none text-stone-900 dark:text-stone-100 max-w-[95px] truncate">
+                      {authUser.displayName?.split(' ')[0] || 'User'}
+                    </div>
+                    <div
+                      className={`text-[9px] font-semibold leading-tight mt-0.5 ${
+                        authUser.emailVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                      }`}
+                    >
+                      {authUser.emailVerified ? 'Verified' : 'Unverified'}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#0B3E39] dark:text-teal-200">
+                  <User className="w-4 h-4" />
+                  <span>Sign In</span>
+                </div>
+              )}
+            </button>
+
             {/* Theme Toggle Button (Light / Dark Mode) */}
             <button
               id="theme-toggle-desktop"
@@ -143,8 +205,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
             <PWASyncStatusIndicator />
           </div>
 
-          {/* Mobile Actions: Theme Toggle + PWA Sync Indicator + Emergency + Menu */}
+          {/* Mobile Actions: Profile + Theme Toggle + PWA Sync Indicator + Emergency + Menu */}
           <div className="flex lg:hidden items-center gap-1.5">
+            <button
+              onClick={() => setActiveView('login')}
+              className="p-1.5 rounded-xl bg-white dark:bg-[#0E2825] border border-stone-200 dark:border-teal-900/60 text-stone-700 dark:text-stone-200 cursor-pointer"
+              title="Account & Login"
+            >
+              {authUser ? (
+                <div className="relative">
+                  <div className="w-6 h-6 rounded-lg bg-[#0B3E39] dark:bg-teal-700 text-white flex items-center justify-center text-[10px] font-bold">
+                    {authUser.displayName ? authUser.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <span
+                    className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-white dark:border-[#0E2825] ${
+                      authUser.emailVerified ? 'bg-emerald-500' : 'bg-amber-500'
+                    }`}
+                  />
+                </div>
+              ) : (
+                <User className="w-5 h-5 text-stone-600 dark:text-stone-300" />
+              )}
+            </button>
             <button
               id="theme-toggle-mobile"
               type="button"

@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with role-based access and verified email status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "photoUrl": { "type": "string", "maxLength": 1000 },
+        "role": { "type": "string", "enum": ["citizen", "ngo", "vet", "admin"] },
+        "emailVerified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "AnimalRecord": {
+      "title": "AnimalRecord",
+      "description": "Registered stray dog or cat record",
+      "type": "object",
+      "properties": {
+        "tagNumber": { "type": "string", "maxLength": 64 },
+        "species": { "type": "string", "enum": ["dog", "cat"] },
+        "vaccinationStatus": { "type": "string", "enum": ["valid", "due_soon", "overdue", "unvaccinated"] },
+        "sterilizationStatus": { "type": "string", "enum": ["sterilized", "intact"] },
+        "registeredBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["tagNumber", "species", "vaccinationStatus"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile and verified role document"
+    },
+    "/animals/{animalId}": {
+      "schema": "AnimalRecord",
+      "description": "Community stray animal records"
+    }
+  }
+}

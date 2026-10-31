@@ -14,6 +14,7 @@ import { QRCardModal } from './components/QRCardModal';
 import { EmergencyReportModal } from './components/EmergencyReportModal';
 import { AIMatcherModal } from './components/AIMatcherModal';
 import { MedicalActionModal } from './components/MedicalActionModal';
+import { LoginPage } from './components/LoginPage';
 import { PawtopiaLogo } from './components/PawtopiaLogo';
 import { Animal } from './types';
 import { Heart, ShieldCheck, Phone, Mail, Award, Info } from 'lucide-react';
@@ -93,6 +94,8 @@ const MainAppContent: React.FC = () => {
         {activeView === 'camps' && <CampsAndFeeders />}
 
         {activeView === 'transparency' && <PublicTransparencyView />}
+
+        {activeView === 'login' && <LoginPage />}
       </main>
 
       {/* Footer */}
@@ -156,6 +159,9 @@ const MainAppContent: React.FC = () => {
                 </button>
                 <button onClick={() => setIsAIMatcherOpen(true)} className="text-left hover:text-white cursor-pointer">
                   AI Matcher
+                </button>
+                <button onClick={() => setActiveView('login')} className="text-left hover:text-white cursor-pointer text-teal-300 font-semibold">
+                  Verified Login
                 </button>
               </div>
             </div>
