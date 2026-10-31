@@ -167,13 +167,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Sync theme with document root class
+  // Sync theme with document root class & body
   useEffect(() => {
     try {
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       }
       localStorage.setItem('pawtopia_theme', theme);
     } catch (e) {

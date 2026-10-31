@@ -49,7 +49,15 @@ const MainAppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F6F0] dark:bg-[#071715] text-stone-800 dark:text-stone-100 font-sans selection:bg-[#0B3E39] selection:text-[#FAF6EE] transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[#F8F6F0] dark:bg-[#051412] text-stone-800 dark:text-stone-100 font-sans selection:bg-[#0B3E39] selection:text-[#FAF6EE] transition-colors duration-200 relative overflow-x-hidden">
+      {/* Ambient Dark Mode Aurora Glow and Precision Micro-Grid */}
+      <div className="hidden dark:block pointer-events-none fixed inset-0 overflow-hidden -z-10" aria-hidden="true">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-teal-500/18 via-emerald-500/10 to-transparent blur-3xl opacity-80" />
+        <div className="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-teal-600/12 blur-[130px] rounded-full" />
+        <div className="absolute top-2/3 -right-48 w-[600px] h-[600px] bg-emerald-600/10 blur-[130px] rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(45,212,191,0.06)_1px,transparent_1px)] [background-size:28px_28px] opacity-40" />
+      </div>
+
       {/* Top Navbar */}
       <Navbar
         onOpenReportModal={() => setIsReportModalOpen(true)}

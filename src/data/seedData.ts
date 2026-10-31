@@ -401,7 +401,7 @@ export const INITIAL_ANIMALS: Animal[] = [
   ...Array.from({ length: 42 }).map((_, idx) => {
     const num = idx + 11;
     const isCat = num % 3 === 0;
-    const species = isCat ? 'cat' : 'dog';
+    const species: Animal['species'] = isCat ? 'cat' : 'dog';
     const zoneIndex = num % INITIAL_ZONES.length;
     const zone = INITIAL_ZONES[zoneIndex];
     const isVax = num % 5 !== 0;
@@ -445,12 +445,12 @@ export const INITIAL_ANIMALS: Animal[] = [
       name: animalName,
       species,
       breed: isCat ? 'Indian Domestic Cat' : 'Desi Indie Breed',
-      gender: num % 2 === 0 ? 'female' : 'male',
+      gender: (num % 2 === 0 ? 'female' : 'male') as Animal['gender'],
       estimatedAgeYears: (num % 6) + 1,
       photoUrl,
       colorPattern: num % 2 === 0 ? 'Fawn with white socks' : 'Dark brindle patch',
       distinctiveMarks: isSteril ? (species === 'cat' ? 'Ear tipped left' : 'V-notch ear tag') : 'Unnotched natural ears',
-      earNotch: isSteril ? (species === 'cat' ? 'tipped' : 'right_v_notch') : 'none',
+      earNotch: (isSteril ? (species === 'cat' ? 'tipped' : 'right_v_notch') : 'none') as Animal['earNotch'],
       primaryLocation: {
         lat: Number((zone.center[0] + latJitter).toFixed(6)),
         lng: Number((zone.center[1] + lngJitter).toFixed(6)),
@@ -460,12 +460,12 @@ export const INITIAL_ANIMALS: Animal[] = [
       vaccinationStatus: vaxStatus,
       lastVaccinationDate: isVax ? `2026-0${(num % 8) + 1}-15` : undefined,
       nextVaccinationDueDate: isVax ? (vaxStatus === 'due_soon' ? '2026-11-12' : `2027-0${(num % 8) + 1}-15`) : undefined,
-      sterilizationStatus: isSteril ? 'sterilized' : 'intact',
+      sterilizationStatus: (isSteril ? 'sterilized' : 'intact') as Animal['sterilizationStatus'],
       sterilizationDate: isSteril ? '2025-02-14' : undefined,
       registeredByRole: 'ngo' as const,
       registeredByName: 'Pawtopia Field Team',
       ngoAffiliation: 'City Animal Care Initiative',
-      adoptionStatus: num % 9 === 0 ? 'available' : 'stray_community',
+      adoptionStatus: (num % 9 === 0 ? 'available' : 'stray_community') as Animal['adoptionStatus'],
       featureEmbedding: generateFeatureVector(`animal-${num}-${species}`),
       createdAt: '2025-01-10',
       updatedAt: '2026-09-01',

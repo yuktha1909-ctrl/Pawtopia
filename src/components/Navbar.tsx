@@ -129,11 +129,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
 
             {/* Theme Toggle Button (Light / Dark Mode) */}
             <button
+              id="theme-toggle-desktop"
               type="button"
               onClick={toggleTheme}
               className="p-2 rounded-xl bg-white dark:bg-[#0E2825] border border-stone-200 dark:border-teal-900/60 text-stone-700 dark:text-amber-300 hover:bg-stone-50 dark:hover:bg-[#12332F] transition shadow-2xs cursor-pointer"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              aria-label="Toggle theme"
+              aria-label="Toggle theme (desktop)"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-stone-700" />}
             </button>
@@ -145,10 +146,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
           {/* Mobile Actions: Theme Toggle + PWA Sync Indicator + Emergency + Menu */}
           <div className="flex lg:hidden items-center gap-1.5">
             <button
+              id="theme-toggle-mobile"
               type="button"
               onClick={toggleTheme}
               className="p-2 rounded-xl bg-white dark:bg-[#0E2825] border border-stone-200 dark:border-teal-900/60 text-stone-700 dark:text-amber-300 cursor-pointer"
-              aria-label="Toggle theme"
+              aria-label="Toggle theme (mobile)"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-stone-700" />}
             </button>
@@ -273,6 +275,34 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenReportModal, onOpenAIMatch
                 </button>
               );
             })}
+          </div>
+
+          {/* Appearance / Theme Switcher for mobile & tablet */}
+          <div className="p-3 bg-[#FAF6EE] dark:bg-[#0B2925] rounded-xl border border-stone-200 dark:border-teal-900/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {theme === 'dark' ? <Moon className="w-4 h-4 text-amber-300" /> : <Sun className="w-4 h-4 text-amber-600" />}
+              <span className="text-xs font-bold text-stone-700 dark:text-stone-200">
+                Appearance: {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-[#071E1B] border border-stone-300 dark:border-teal-800 text-stone-800 dark:text-amber-300 shadow-2xs cursor-pointer active:scale-95 transition"
+              aria-label="Toggle theme between light and dark"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-stone-700" />
+                  <span>Dark Mode</span>
+                </>
+              )}
+            </button>
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-teal-900/40 text-xs text-stone-500 dark:text-stone-400">

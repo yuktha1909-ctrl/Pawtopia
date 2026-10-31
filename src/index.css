@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     --brand-dark-teal: #0B3E39;
@@ -9,22 +11,97 @@
     --brand-cream-card: #FFFFFF;
     --brand-cream-border: #E8E2D2;
     --brand-amber: #D97706;
+    color-scheme: light;
+  }
+
+  :root.dark, html.dark {
+    color-scheme: dark;
+    --brand-dark-teal: #071D1A;
+    --brand-teal: #14B8A6;
+    --brand-teal-light: #2DD4BF;
+    --brand-cream: #0B2522;
+    --brand-cream-card: #0A221F;
+    --brand-cream-border: rgba(45, 212, 191, 0.2);
+    --brand-amber: #F59E0B;
   }
 
   body {
     background-color: #F8F6F0;
     color: #1A2825;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .dark body {
-    background-color: #071715;
-    color: #E6EFEB;
+  /* Atmospheric rich dark mode background with subtle celestial aurora glows */
+  .dark body, body.dark, html.dark body {
+    background-color: #051412;
+    background-image: 
+      radial-gradient(ellipse 90% 60% at 50% -10%, rgba(13, 148, 136, 0.22), transparent 75%),
+      radial-gradient(circle 800px at 100% 25%, rgba(16, 185, 129, 0.08), transparent 60%),
+      radial-gradient(circle 800px at 0% 75%, rgba(20, 184, 166, 0.07), transparent 60%);
+    background-attachment: fixed;
+    color: #EDF5F2;
   }
 }
 
-/* Custom scrollbars & printing rules for QR card collar tag */
+/* Custom dark scrollbar */
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #051412;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #0E3530;
+  border-radius: 4px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #144942;
+}
+
+/* Leaflet Map Controls, Popups & Tooltips in Dark Mode */
+html.dark .leaflet-container {
+  background: #061412 !important;
+}
+
+html.dark .leaflet-tile-pane {
+  filter: brightness(0.9) contrast(1.05);
+}
+
+html.dark .leaflet-popup-content-wrapper {
+  background: #0B2522 !important;
+  color: #EDF5F2 !important;
+  border: 1px solid rgba(45, 212, 191, 0.3) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(20, 184, 166, 0.15) !important;
+  border-radius: 1rem !important;
+}
+
+html.dark .leaflet-popup-tip {
+  background: #0B2522 !important;
+}
+
+html.dark .leaflet-bar a {
+  background-color: #0A221F !important;
+  color: #5EEAD4 !important;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.2) !important;
+}
+
+html.dark .leaflet-bar a:hover {
+  background-color: #123833 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .pawtopia-tooltip {
+  background: #0B2522 !important;
+  color: #EDF5F2 !important;
+  border: 1px solid rgba(45, 212, 191, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Custom printing rules for QR card collar tag */
 @media print {
   body {
     background: #ffffff !important;

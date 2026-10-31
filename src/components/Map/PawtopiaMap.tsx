@@ -22,9 +22,10 @@ interface PawtopiaMapProps {
 }
 
 export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSelectReport }) => {
-  const { animals, reports, zones, getWardReadiness } = useApp();
+  const { animals, reports, zones, getWardReadiness, theme } = useApp();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const heatLayerRef = useRef<L.LayerGroup | null>(null);
 
@@ -49,12 +50,18 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Initial tile layer based on current theme (CartoDB Dark Matter for dark, OpenStreetMap for light)
+    const tileUrl =
+      theme === 'dark'
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const tileLayer = L.tileLayer(tileUrl, {
       attribution: '&copy; OpenStreetMap contributors | Pawtopia Stray Surveillance',
       maxZoom: 19,
     }).addTo(map);
 
+    tileLayerRef.current = tileLayer;
     markersLayerRef.current = L.layerGroup().addTo(map);
     heatLayerRef.current = L.layerGroup().addTo(map);
 
@@ -63,8 +70,19 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
     return () => {
       map.remove();
       mapInstanceRef.current = null;
+      tileLayerRef.current = null;
     };
   }, []);
+
+  // Sync Leaflet tile layer whenever theme toggles between dark and light
+  useEffect(() => {
+    if (!tileLayerRef.current) return;
+    const newTileUrl =
+      theme === 'dark'
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    tileLayerRef.current.setUrl(newTileUrl);
+  }, [theme]);
 
   // Update Markers & Heatmap based on filters
   useEffect(() => {
@@ -217,28 +235,30 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-130px)] min-h-[580px] bg-stone-100 overflow-hidden">
+    <div className="relative w-full h-[calc(100vh-130px)] min-h-[580px] bg-stone-100 dark:bg-[#061412] overflow-hidden">
       {/* Map Element */}
       <div ref={mapContainerRef} className="w-full h-full z-0" tabIndex={0} aria-label="Interactive stray animal map" />
 
       {/* Floating Control & Filter Panel (Top Left) */}
-      <div className="absolute top-4 left-4 z-10 max-w-sm w-full bg-[#FAF6EE]/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-[#0B3E39]/15">
+      <div className="absolute top-4 left-4 z-10 max-w-sm w-full bg-[#FAF6EE]/95 dark:bg-[#0A221F]/90 backdrop-blur-md rounded-2xl p-4 shadow-xl dark:shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.06)] border border-[#0B3E39]/15 dark:border-teal-500/25 transition-colors">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#0B3E39]" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-[#0B3E39]">Stray Surveillance Map</h2>
+            <Layers className="w-4 h-4 text-[#0B3E39] dark:text-teal-300" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-[#0B3E39] dark:text-teal-200">Stray Surveillance Map</h2>
           </div>
-          <span className="text-[11px] font-bold text-stone-500 bg-white px-2 py-0.5 rounded-full border border-stone-200">
+          <span className="text-[11px] font-bold text-stone-600 dark:text-teal-200 bg-white dark:bg-[#071917] px-2 py-0.5 rounded-full border border-stone-200 dark:border-teal-500/20 shadow-2xs">
             {animals.length} Animals Tracked
           </span>
         </div>
 
         {/* Species Filter Buttons */}
-        <div className="grid grid-cols-3 gap-1.5 p-1 bg-white/80 rounded-xl border border-stone-200 mb-3">
+        <div className="grid grid-cols-3 gap-1.5 p-1 bg-white/80 dark:bg-[#071917]/90 rounded-xl border border-stone-200 dark:border-teal-500/20 mb-3">
           <button
             onClick={() => setSelectedSpecies('all')}
             className={`py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-              selectedSpecies === 'all' ? 'bg-[#0B3E39] text-white shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              selectedSpecies === 'all'
+                ? 'bg-[#0B3E39] dark:bg-teal-600 text-white shadow-2xs dark:shadow-[0_0_12px_rgba(20,184,166,0.3)]'
+                : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white'
             }`}
           >
             All Species
@@ -246,7 +266,9 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
           <button
             onClick={() => setSelectedSpecies('dog')}
             className={`flex items-center justify-center gap-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-              selectedSpecies === 'dog' ? 'bg-[#0B3E39] text-white shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              selectedSpecies === 'dog'
+                ? 'bg-[#0B3E39] dark:bg-teal-600 text-white shadow-2xs dark:shadow-[0_0_12px_rgba(20,184,166,0.3)]'
+                : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white'
             }`}
           >
             <Dog className="w-3.5 h-3.5" />
@@ -255,7 +277,9 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
           <button
             onClick={() => setSelectedSpecies('cat')}
             className={`flex items-center justify-center gap-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-              selectedSpecies === 'cat' ? 'bg-[#0B3E39] text-white shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+              selectedSpecies === 'cat'
+                ? 'bg-[#0B3E39] dark:bg-teal-600 text-white shadow-2xs dark:shadow-[0_0_12px_rgba(20,184,166,0.3)]'
+                : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white'
             }`}
           >
             <Cat className="w-3.5 h-3.5" />
@@ -277,8 +301,8 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
               onClick={() => setFilterStatus(st.id as any)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
                 filterStatus === st.id
-                  ? 'bg-[#0B3E39] text-white'
-                  : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50'
+                  ? 'bg-[#0B3E39] dark:bg-teal-600 text-white dark:shadow-[0_0_12px_rgba(20,184,166,0.3)]'
+                  : 'bg-white dark:bg-[#0E2C28] text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-teal-500/20 hover:bg-stone-50 dark:hover:bg-[#133A35]'
               }`}
             >
               {st.label}
@@ -287,16 +311,16 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
         </div>
 
         {/* Heatmap & Density Toggle */}
-        <div className="flex items-center justify-between pt-2 border-t border-stone-200/80">
-          <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer">
-            <Flame className={`w-4 h-4 ${showHeatmap ? 'text-rose-500' : 'text-stone-400'}`} />
-            <span>Population & Hotspot Heatmap</span>
+        <div className="flex items-center justify-between pt-2 border-t border-stone-200/80 dark:border-teal-500/20">
+          <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 dark:text-stone-200 cursor-pointer">
+            <Flame className={`w-4 h-4 ${showHeatmap ? 'text-rose-500 animate-pulse' : 'text-stone-400'}`} />
+            <span>Population &amp; Hotspot Heatmap</span>
           </label>
           <input
             type="checkbox"
             checked={showHeatmap}
             onChange={(e) => setShowHeatmap(e.target.checked)}
-            className="w-4 h-4 text-[#0B3E39] rounded border-stone-300 focus:ring-[#0B3E39] cursor-pointer"
+            className="w-4 h-4 text-teal-600 rounded border-stone-300 dark:border-teal-500/30 dark:bg-[#071917] focus:ring-teal-500 cursor-pointer"
           />
         </div>
 
@@ -305,11 +329,11 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
           <select
             value={selectedWard}
             onChange={(e) => setSelectedWard(e.target.value)}
-            className="w-full text-xs font-medium text-stone-700 bg-white border border-stone-200 rounded-xl px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            className="w-full text-xs font-medium text-stone-700 dark:text-stone-200 bg-white dark:bg-[#0E2C28] border border-stone-200 dark:border-teal-500/20 rounded-xl px-2.5 py-1.5 focus:outline-none cursor-pointer"
           >
-            <option value="all">All City Wards & Zones</option>
+            <option value="all">All City Wards &amp; Zones</option>
             {zones.map((z) => (
-              <option key={z.id} value={z.wardName}>
+              <option key={z.id} value={z.wardName} className="dark:bg-[#0A221F]">
                 {z.wardName}
               </option>
             ))}
@@ -320,72 +344,72 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
       {/* Floating GPS Locate Button (Bottom Right) */}
       <button
         onClick={handleLocateMe}
-        className="absolute bottom-6 right-6 z-10 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-white text-[#0B3E39] border border-stone-300 shadow-xl hover:bg-stone-50 active:scale-95 transition cursor-pointer text-xs font-bold"
+        className="absolute bottom-6 right-6 z-10 flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#0A221F] text-[#0B3E39] dark:text-teal-200 border border-stone-300 dark:border-teal-500/30 shadow-xl dark:shadow-[0_8px_25px_rgba(0,0,0,0.6)] hover:bg-stone-50 dark:hover:bg-[#0E2C28] active:scale-95 transition cursor-pointer text-xs font-bold"
         title="Find your current location"
       >
-        <Locate className="w-4 h-4 text-[#0B3E39]" />
+        <Locate className="w-4 h-4 text-[#0B3E39] dark:text-teal-300" />
         <span className="hidden sm:inline">My Location</span>
       </button>
 
       {/* Quick Animal Detail Drawer (When Marker is Clicked) */}
       {selectedItemSummary && (
-        <div className="absolute bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-20 bg-white rounded-2xl shadow-2xl border border-stone-200 p-4 animate-in slide-in-from-bottom-3">
+        <div className="absolute bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-20 bg-white dark:bg-[#0A221F]/95 backdrop-blur-md rounded-2xl shadow-2xl dark:shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.06)] border border-stone-200 dark:border-teal-500/30 p-4 animate-in slide-in-from-bottom-3 text-stone-900 dark:text-stone-100">
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
               <img
                 src={selectedItemSummary.photoUrl}
                 alt={selectedItemSummary.name || selectedItemSummary.tagNumber}
-                className="w-14 h-14 rounded-xl object-cover border border-stone-200 shadow-xs"
+                className="w-14 h-14 rounded-xl object-cover border border-stone-200 dark:border-teal-500/30 shadow-xs"
               />
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#0B3E39] border border-teal-200">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/80 text-[#0B3E39] dark:text-teal-200 border border-teal-200 dark:border-teal-500/30">
                     {selectedItemSummary.tagNumber}
                   </span>
                   {selectedItemSummary.earNotch !== 'none' && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-100 text-stone-700 border border-stone-200 flex items-center gap-1">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-100 dark:bg-[#071917] text-stone-700 dark:text-teal-300 border border-stone-200 dark:border-teal-500/20 flex items-center gap-1">
                       ✂ {selectedItemSummary.earNotch.replace(/_/g, ' ')}
                     </span>
                   )}
                 </div>
-                <h3 className="text-sm font-black text-stone-900 mt-0.5">
+                <h3 className="text-sm font-black text-stone-900 dark:text-white mt-0.5">
                   {selectedItemSummary.name || `${selectedItemSummary.species.toUpperCase()} (${selectedItemSummary.tagNumber})`}
                 </h3>
-                <p className="text-xs text-stone-500">{selectedItemSummary.breed || 'Indie'}</p>
+                <p className="text-xs text-stone-500 dark:text-stone-300">{selectedItemSummary.breed || 'Indie'}</p>
               </div>
             </div>
             <button
               onClick={() => setSelectedItemSummary(null)}
-              className="text-stone-400 hover:text-stone-700 text-sm font-bold p-1 cursor-pointer"
+              className="text-stone-400 dark:text-stone-400 hover:text-stone-700 dark:hover:text-white text-sm font-bold p-1 cursor-pointer"
             >
               ✕
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-stone-100 my-2">
+          <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-stone-100 dark:border-teal-500/20 my-2">
             <div>
-              <span className="text-stone-400 block text-[10px] uppercase font-bold">Vaccination:</span>
+              <span className="text-stone-400 dark:text-stone-400 block text-[10px] uppercase font-bold">Vaccination:</span>
               <span
                 className={`font-semibold ${
                   selectedItemSummary.vaccinationStatus === 'valid'
-                    ? 'text-emerald-700'
+                    ? 'text-emerald-700 dark:text-emerald-300'
                     : selectedItemSummary.vaccinationStatus === 'due_soon'
-                    ? 'text-amber-700'
-                    : 'text-rose-700'
+                    ? 'text-amber-700 dark:text-amber-300'
+                    : 'text-rose-700 dark:text-rose-300'
                 }`}
               >
                 {selectedItemSummary.vaccinationStatus.toUpperCase().replace(/_/g, ' ')}
               </span>
             </div>
             <div>
-              <span className="text-stone-400 block text-[10px] uppercase font-bold">Sterilization:</span>
-              <span className="font-semibold text-stone-800 capitalize">
+              <span className="text-stone-400 dark:text-stone-400 block text-[10px] uppercase font-bold">Sterilization:</span>
+              <span className="font-semibold text-stone-800 dark:text-stone-200 capitalize">
                 {selectedItemSummary.sterilizationStatus}
               </span>
             </div>
           </div>
 
-          <div className="text-[11px] text-stone-500 mb-3 truncate">
+          <div className="text-[11px] text-stone-500 dark:text-stone-400 mb-3 truncate">
             📍 {selectedItemSummary.primaryLocation.address || selectedItemSummary.primaryLocation.wardName}
           </div>
 
@@ -394,7 +418,7 @@ export const PawtopiaMap: React.FC<PawtopiaMapProps> = ({ onSelectAnimal, onSele
               onSelectAnimal(selectedItemSummary);
               setSelectedItemSummary(null);
             }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#0B3E39] text-[#FAF6EE] font-bold text-xs hover:bg-[#145E56] transition shadow-xs cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#0B3E39] dark:bg-gradient-to-r dark:from-teal-600 dark:to-emerald-600 text-[#FAF6EE] font-bold text-xs hover:bg-[#145E56] dark:hover:from-teal-500 dark:hover:to-emerald-500 transition shadow-xs dark:shadow-[0_0_15px_rgba(20,184,166,0.3)] cursor-pointer"
           >
             <Tag className="w-3.5 h-3.5" />
             <span>Open Health Identity &amp; Collar Tag</span>

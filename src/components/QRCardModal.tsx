@@ -3,6 +3,7 @@ import { Animal } from '../types';
 import { PawtopiaLogo } from './PawtopiaLogo';
 import { useApp } from '../context/AppContext';
 import { getVaccinationBadgeMeta } from '../utils/vaccination';
+import { CollarTagLabelGenerator } from './CollarTagLabelGenerator';
 import {
   Printer,
   ShieldCheck,
@@ -15,6 +16,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Share2,
+  Tag,
 } from 'lucide-react';
 
 interface QRCardModalProps {
@@ -30,9 +32,10 @@ export const QRCardModal: React.FC<QRCardModalProps> = ({
   onOpenVaccinationDialog,
   onOpenSterilizationDialog,
 }) => {
-  const { role } = useApp();
+  const { role, animals } = useApp();
   const [activeTab, setActiveTab] = useState<'card' | 'public_scan'>('card');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showCollarTagTool, setShowCollarTagTool] = useState(false);
 
   if (!animal) return null;
 
@@ -102,20 +105,28 @@ export const QRCardModal: React.FC<QRCardModalProps> = ({
               <p className="text-xs text-stone-500">
                 Print and laminate this collar card or QR tag for field teams, community feeders, and pet collars.
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleCopyLink}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-teal-800 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-teal-950/40 transition cursor-pointer"
                 >
                   <Share2 className="w-3.5 h-3.5 text-stone-500" />
                   <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
                 </button>
                 <button
+                  onClick={() => setShowCollarTagTool(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                  title="Configure physical collar dimensions, cut guides, hole punch, or batch sheets"
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  <span>Tag Label Generator</span>
+                </button>
+                <button
                   onClick={handlePrint}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#0B3E39] text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] transition shadow-xs cursor-pointer"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B3E39] text-[#FAF6EE] text-xs font-bold hover:bg-[#145E56] transition shadow-xs cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>Print Collar Tag</span>
+                  <span>Quick Print</span>
                 </button>
               </div>
             </div>
@@ -296,6 +307,14 @@ export const QRCardModal: React.FC<QRCardModalProps> = ({
           </div>
         )}
       </div>
+
+      {/* Collar Tag Label Generator Modal */}
+      <CollarTagLabelGenerator
+        animal={animal}
+        allAnimals={animals}
+        isOpen={showCollarTagTool}
+        onClose={() => setShowCollarTagTool(false)}
+      />
     </div>
   );
 };
