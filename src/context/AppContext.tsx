@@ -154,7 +154,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const [activeView, setActiveView] = useState<string>('map');
+  const [activeView, setActiveView] = useState<string>('login');
   const [animals, setAnimals] = useState<Animal[]>(INITIAL_ANIMALS);
   const [reports, setReports] = useState<EmergencyReport[]>(INITIAL_REPORTS);
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
@@ -190,7 +190,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const offlineQueueCount = offlineQueue.length;
 
-  // Authentication State
+  // Authentication State: default to null so the Login page is presented first
   const [authUser, setAuthUser] = useState<AuthUser | null>(() => {
     try {
       const saved = localStorage.getItem('pawtopia_auth_user');
@@ -198,15 +198,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-    return {
-      uid: 'paw-verified-lead-01',
-      displayName: 'Dr. Ananya Sharma',
-      email: 'ananya.sharma@bbmp-animalcare.gov.in',
-      photoUrl: 'https://images.unsplash.com/photo-1594824813624-9fa2a5884ffb?auto=format&fit=crop&w=256&q=80',
-      emailVerified: true,
-      role: 'ngo',
-      provider: 'demo',
-    };
+    return null;
   });
   const [authLoading, setAuthLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -276,6 +268,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // ignore
       }
       setAuthSuccessMsg(`Signed in with verified Google account: ${verifiedUser.email}`);
+      setActiveView('map');
     } catch (err: any) {
       console.error('Google sign in error:', err);
       // Fallback friendly message for popup blockers or domain restrictions
@@ -317,6 +310,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // ignore
       }
       setAuthSuccessMsg(`Logged in successfully as ${loggedUser.email}`);
+      setActiveView('map');
     } catch (err: any) {
       console.error('Email login error:', err);
       if (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential') {
@@ -363,6 +357,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // ignore
       }
       setAuthSuccessMsg(`Account created for ${newUser.email}! A verification link has been sent to your inbox.`);
+      setActiveView('map');
     } catch (err: any) {
       console.error('Registration error:', err);
       if (err?.code === 'auth/email-already-in-use') {
@@ -441,6 +436,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
     setAuthSuccessMsg('You have been logged out.');
+    setActiveView('login');
   };
 
   // Instant switch to verified role (for municipal officers, vets, rescuers, citizens)
@@ -450,7 +446,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       admin: { name: 'Dr. Ramesh Rao (BBMP Joint Commissioner)', email: 'ramesh.rao@bbmp.gov.in' },
       ngo: { name: 'Dr. Ananya Sharma (Lead Field Rescuer)', email: 'ananya.sharma@bbmp-animalcare.gov.in' },
       vet: { name: 'Dr. Vivek Menon, MVSc (Chief Veterinary Surgeon)', email: 'dr.menon@pawtopia-health.org' },
-      citizen: { name: 'Kavitha Sundaram (Active Community Feeder)', email: 'kavitha.sundaram@gmail.com' },
+      citizen: { name: 'Yuktha Sundaram (Active Community Feeder)', email: 'yuktha907@gmail.com' },
     };
     const profile = roleProfiles[targetRole];
     const verifiedUser: AuthUser = {
@@ -470,6 +466,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
     setAuthSuccessMsg(`Switched to verified ${targetRole.toUpperCase()} account: ${profile.email}`);
+    setActiveView('map');
   };
 
   // Persist queue to localStorage
